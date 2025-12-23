@@ -82,7 +82,7 @@ const img = document.createElement('img');
   img.style.objectFit = 'cover';
   card.appendChild(img);
 
-onst body = document.createElement('div');
+const body = document.createElement('div');
   body.className = 'card-body';
   const title = document.createElement('div');
   title.className = 'card-title';
