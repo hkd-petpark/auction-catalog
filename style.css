@@ -1,0 +1,66 @@
+/* ベーススタイル */
+:root { --bg:#f9fafb; --card:#fff; --text:#222; --muted:#666; --accent:#0b74de; }
+*{ box-sizing:border-box; }
+body{ margin:0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif; color:var(--text); background:var(--bg); }
+.site-header{ padding:24px; background:#fff; border-bottom:1px solid #eee; }
+.site-header h1{ margin:0 0 8px; font-size:22px; }
+.actions{ display:flex; gap:12px; align-items:center; }
+.file-label .btn{ display:inline-block; padding:8px 12px; background:var(--accent); color:#fff; border-radius:6px; cursor:pointer; }
+#search{ flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:6px; }
+.hint{ color:var(--muted); font-size:12px; }
+.card-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px; padding:24px; }
+.card{ background:var(--card); border:1px solid #eee; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; flex-direction:column; }
+.card-body{ padding:12px; }
+.card-title{ display:flex; justify-content:space-between; align-items:center; }
+.card-title h3{ margin:0; font-size:16px; }
+.badge{ font-size:12px; color:#fff; background:#333; padding:2px 6px; border-radius:4px; }
+.meta{ color:var(--muted); font-size:13px; display:flex; flex-direction:column; gap:4px; }
+.card-footer{ margin-top:auto; padding:12px; display:flex; justify-content:flex-end; }
+.card-footer .btn{ padding:6px 10px; border:1px solid var(--accent); color:var(--accent); border-radius:6px; text-decoration:none; font-size:13px; }
+.modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); }
+.modal.show{ display:flex; }
+.modal-content{ background:#fff; width:min(900px, 96vw); max-height:90vh; border-radius:10px; overflow:auto; position:relative; }
+.close{ position:absolute; right:8px; top:8px; border:none; background:#eee; border-radius:50%; width:32px; height:32px; cursor:pointer; }
+.modal-body{ padding:18px; }
+.detail-table{ width:100%; border-collapse:collapse; margin-top:12px; }
+.detail-table th, .detail-table td{ border-bottom:1px solid #eee; padding:8px; text-align:left; font-size:14px; }
+.detail-table th{ width:180px; color:#555; }
+
+/* ライトボックス */
+
+.lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999; }
+.lightbox.show { display:flex; }
+
+.lightbox-content {
+  position: relative;
+  max-width: 96vw; max-height: 92vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-close {
+  position: absolute; right: 8px; top: 8px;
+  border: none; background: #eee; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer;
+  font-size: 18px; line-height: 32px;
+}
+#lightboxImage {
+  max-width: 96vw; max-height: 92vh;
+  object-fit: contain;
+  /* 簡易ズーム時のトランジション */
+  transition: transform 0.2s ease-in-out;
+}
+
+
+/* ピンチズーム用：ブラウザのジェスチャーを抑止・スムーズ描画 */
+#lightboxImage {
+  touch-action: none;        /* ← これが超重要：ブラウザのパン/ズームをオフ */
+  will-change: transform;    /* transformの再計算を最適化 */
+  cursor: grab;
+}
+#lightboxImage:active { cursor: grabbing; }
+
+
+/* 公開時はCSV選択を隠す */
+.file-label { display: none !important; }
+
+
+.thumb { pointer-events:auto; }
