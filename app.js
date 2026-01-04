@@ -218,12 +218,14 @@ function closeModal(){
   modal.setAttribute('aria-hidden','true');
 }
 
-// ===== 描画メイン（画像URLは任意列） =====
+
+// ===== 描画メイン（写真が無い個体は除外 & 欠点項目を取り込む） =====
 async function renderFromCSV(text){
   const { header, data } = parseCSV(text);
   try { ensureHeadersStrictRelaxed(header); }
   catch(err){ alert(err.message); return; }
 
+  // 基本項目のインデックス
   const idx = {
     species: header.indexOf('種類'),
     color: header.indexOf('毛色'),
@@ -233,13 +235,15 @@ async function renderFromCSV(text){
     shikishoNo: header.indexOf('仕切書No')
   };
 
- // 欠点項目のヘッダー位置（存在しない場合は -1）
- const defectIdx = {};
- DEFECT_FIELDS.forEach(name => { defectIdx[name] = header.indexOf(name); });
-  
-// CSV → オブジェクト
+  // 欠点項目のインデックス（存在しない列は -1）
+  const defectIdx = {};
+  DEFECT_FIELDS.forEach(name => { defectIdx[name] = header.indexOf(name); });
+
+  // CSV → オブジェクト（return の前に欠点を必ず詰める）
   const rawItems = data.map(row => {
     const get = (j) => (j>=0 && j<row.length) ? (row[j] ?? '').trim() : '';
+
+    // まず item を作成
     const item = {
       species: get(idx.species),
       color: get(idx.color),
@@ -248,33 +252,37 @@ async function renderFromCSV(text){
       pedigreeOrg: get(idx.pedigreeOrg),
       shikishoNo: get(idx.shikishoNo)
     };
-    
-+   // 欠点項目をまとめて保持（空は後で表示スキップ）
-+   const defects = {};
-+   for (const name of DEFECT_FIELDS) {
-+     const j = defectIdx[name];
-+     defects[name] = get(j); // ヘッダーが無ければ '' のまま
-+   }
-+   item.defects = defects;
+
+    // 欠点項目を詰める（空は後で非表示にする前提）
+    const defects = {};
+    for (const name of DEFECT_FIELDS) {
+      const j = defectIdx[name];
+      defects[name] = get(j); // ヘッダーが無ければ '' のまま
+    }
+    item.defects = defects;
+
+    // 最後に返す（この return より後にコードを書かない）
     return item;
   });
 
- // ★ 画像の存在を先に一括解決（仕切書Noと一致ファイル）
+  // 写真の存在を一括解決（仕切書Noと一致ファイル）
   const resolvedImages = await Promise.all(
     rawItems.map(it => resolveImageByNo(it.shikishoNo))
   );
 
-
- // ★ 画像がある個体だけを描画対象にフィルタ
+  // 写真がある個体だけを描画
   const items = rawItems
-    .map((it, i) => ({ ...it, _image: resolvedImages[i] })) // 画像URLを一時プロパティに保持
-    .filter(it => it._image != null);                        // ← 写真なしは一覧に出さない
+    .map((it, i) => ({ ...it, _image: resolvedImages[i] }))
+    .filter(it => it._image != null);
 
-
+  // 描画
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  items.forEach((item, i) => { grid.appendChild(createCard(item, i+1)); });
+  items.forEach((item, i) => {
+    grid.appendChild(createCard(item, i + 1));
+  });
 
+  // 検索（仕切書Noは UI 非表示なら検索対象から外す）
   const search = document.getElementById('search');
   search.oninput = () => {
     const q = search.value.toLowerCase();
@@ -286,6 +294,7 @@ async function renderFromCSV(text){
     });
   };
 }
+
 
 
 // ▼ 1) 公開時は手動選択イベントを無効化（コメントアウト）
