@@ -240,7 +240,7 @@ async function renderFromCSV(text){
 // CSV → オブジェクト
   const rawItems = data.map(row => {
     const get = (j) => (j>=0 && j<row.length) ? (row[j] ?? '').trim() : '';
-    return {
+    const item = {
       species: get(idx.species),
       color: get(idx.color),
       sex: get(idx.sex),
