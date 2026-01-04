@@ -56,6 +56,12 @@ function ensureHeadersStrictRelaxed(header) {
   // 画像URLは任意なのでチェック不要
 }
 
+// 欠点項目のヘッダー名 → ラベル（表示名）
+const DEFECT_FIELDS = [
+  '体重','毛質','耳','ペコ','目','鼻','嚙み合わせ','門歯歯列',
+  'デベソ','ヘルニア','狼爪','尾','パテラ左','パテラ右','胸','心雑','その他（ミスカラーなど）'
+];
+
 // ===== 3桁ゼロパディング No.001 =====
 function toNo(n) { return `No.${String(n).padStart(3,'0')}`; }
 
@@ -178,6 +184,30 @@ function openModal(item, noLabel) {
   body.appendChild(title);
   body.appendChild(table);
 
++ // ===== 欠点情報セクション =====
++ // 空項目は非表示、全て空ならセクションごと非表示
++ const defects = item.defects || {};
++ const nonEmpty = Object.entries(defects).filter(([k,v]) => (v ?? '').trim().length > 0);
++ if (nonEmpty.length > 0) {
++   // 見出し
++   const h3 = document.createElement('h3');
++   h3.textContent = '欠点情報';
++   h3.style.marginTop = '16px';
++   body.appendChild(h3);
++
++   // 欠点テーブル
++   const dtable = document.createElement('table');
++   dtable.className = 'detail-table';
++   nonEmpty.forEach(([k,v]) => {
++     const tr = document.createElement('tr');
++     const th = document.createElement('th'); th.textContent = k;
++     const td = document.createElement('td'); td.textContent = v;
++     tr.appendChild(th); tr.appendChild(td);
++     dtable.appendChild(tr);
++   });
++   body.appendChild(dtable);
++ }
+  
   modal.classList.add('show');
   modal.setAttribute('aria-hidden','false');
 }
@@ -203,6 +233,10 @@ async function renderFromCSV(text){
     shikishoNo: header.indexOf('仕切書No')
   };
 
+ // 欠点項目のヘッダー位置（存在しない場合は -1）
+ const defectIdx = {};
+ DEFECT_FIELDS.forEach(name => { defectIdx[name] = header.indexOf(name); });
+  
 // CSV → オブジェクト
   const rawItems = data.map(row => {
     const get = (j) => (j>=0 && j<row.length) ? (row[j] ?? '').trim() : '';
@@ -214,6 +248,15 @@ async function renderFromCSV(text){
       pedigreeOrg: get(idx.pedigreeOrg),
       shikishoNo: get(idx.shikishoNo)
     };
+    
++   // 欠点項目をまとめて保持（空は後で表示スキップ）
++   const defects = {};
++   for (const name of DEFECT_FIELDS) {
++     const j = defectIdx[name];
++     defects[name] = get(j); // ヘッダーが無ければ '' のまま
++   }
++   item.defects = defects;
+    return item;
   });
 
  // ★ 画像の存在を先に一括解決（仕切書Noと一致ファイル）
