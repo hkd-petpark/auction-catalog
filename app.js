@@ -189,19 +189,10 @@ function closeModal(){
 }
 
 // ===== 描画メイン（画像URLは任意列） =====
-function renderFromCSV(text) {
-  console.clear();
+async function renderFromCSV(text){
   const { header, data } = parseCSV(text);
-  console.info('[診断] header =', header);
-  console.info('[診断] data rows =', data.length);
-
-  try {
-    ensureHeadersStrictRelaxed(header); // 画像URLは任意
-  } catch (err) {
-    console.error('[診断] ヘッダーチェック:', err.message);
-    alert(err.message);
-    return;
-  }
+  try { ensureHeadersStrictRelaxed(header); }
+  catch(err){ alert(err.message); return; }
 
   const idx = {
     species: header.indexOf('種類'),
@@ -212,17 +203,30 @@ function renderFromCSV(text) {
     shikishoNo: header.indexOf('仕切書No')
   };
 
-  const items = data.map((row) => {
+// CSV → オブジェクト
+  const rawItems = data.map(row => {
     const get = (j) => (j>=0 && j<row.length) ? (row[j] ?? '').trim() : '';
     return {
       species: get(idx.species),
-      color:   get(idx.color),
-      sex:     get(idx.sex),
-      birth:   get(idx.birth),
+      color: get(idx.color),
+      sex: get(idx.sex),
+      birth: get(idx.birth),
       pedigreeOrg: get(idx.pedigreeOrg),
-      shikishoNo:  get(idx.shikishoNo)
+      shikishoNo: get(idx.shikishoNo)
     };
   });
+
+ // ★ 画像の存在を先に一括解決（仕切書Noと一致ファイル）
+  const resolvedImages = await Promise.all(
+    rawItems.map(it => resolveImageByNo(it.shikishoNo))
+  );
+
+
+ // ★ 画像がある個体だけを描画対象にフィルタ
+  const items = rawItems
+    .map((it, i) => ({ ...it, _image: resolvedImages[i] })) // 画像URLを一時プロパティに保持
+    .filter(it => it._image != null);                        // ← 写真なしは一覧に出さない
+
 
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
