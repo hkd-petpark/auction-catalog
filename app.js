@@ -52,15 +52,16 @@ function parseCSV(text) {
   return { header, data };
 }
 
-
 // ===== ヘッダー厳密チェック（6列のみ必須） =====
-function ensureHeadersStrictRelaxed(header){
+function ensureHeadersStrictRelaxed(header) {
   const required = ['種類','毛色','性別','生年月日','血統書団体名','仕切書No'];
   const normalized = header.map(h => (h ?? '').trim());
   const missing = required.filter(exp => !normalized.includes(exp));
   if (missing.length) {
-    throw new Error('必須ヘッダーが不足しています:
-' + missing.map(m => `- ${m}`).join('\n'));
+    throw new Error(
+      '必須ヘッダーが不足しています:\n' +
+      missing.map(m => `- ${m}`).join('\n')
+    );
   }
 }
 
@@ -315,3 +316,4 @@ function openLightbox(src){
 function closeLightbox(){ if (!lb) return; lb.el.classList.remove('show'); lb.el.setAttribute('aria-hidden','true'); lb.img.src=''; }
 
 document.addEventListener('DOMContentLoaded', initLightbox);
+
