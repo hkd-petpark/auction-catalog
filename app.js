@@ -117,7 +117,6 @@ const body = document.createElement('div');
     textLine('性別', item.sex),
     textLine('生年月日', item.birth),
     textLine('血統書団体名', item.pedigreeOrg),
-    textLine('仕切書No', item.shikishoNo),
   );
 
   const footer = document.createElement('div');
