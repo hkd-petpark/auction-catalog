@@ -1,34 +1,38 @@
 
+
 // ===== CSVパーサ（BOM・改行揃え・区切り自動・ダブルクオート対応） =====
-function parseCSV(text){
-  text = text.split('
-').join('
-');
-  text = text.split('').join('
-');
-  if (text.length && text.charCodeAt(0) === 0xFEFF) { text = text.slice(1); }
-  const lines = text.split('
-');
+function parseCSV(text) {
+  // 改行正規化
+  text = text.split('\r\n').join('\n');
+  text = text.split('\r').join('\n');
+
+  // BOM除去（UTF-8先頭の不可視文字）
+  if (text.length && text.charCodeAt(0) === 0xFEFF) {
+    text = text.slice(1);
+  }
+
+  const lines = text.split('\n');
   while (lines.length && lines[0].trim().length === 0) { lines.shift(); }
-  text = lines.join('
-');
-  const firstLine = text.split('
-')[0] || '';
+  text = lines.join('\n');
+
+  const firstLine = text.split('\n')[0] || '';
   const commaCount = (firstLine.split(',').length - 1);
-  const semiCount = (firstLine.split(';').length - 1);
+  const semiCount  = (firstLine.split(';').length - 1);
   const SEP = semiCount > commaCount ? ';' : ',';
+
   const rows = [];
   let i = 0, field = '', row = [], inQuotes = false;
+
   while (i < text.length) {
     const c = text[i];
     if (inQuotes) {
-      if (c === '"') { if (text[i+1] === '"') { field += '"'; i++; } else { inQuotes = false; } }
-      else { field += c; }
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i++; } else { inQuotes = false; }
+      } else { field += c; }
     } else {
       if (c === '"') { inQuotes = true; }
       else if (c === SEP) { row.push(field); field = ''; }
-      else if (c === '
-') {
+      else if (c === '\n') {
         row.push(field);
         const trimmed = row.map(v => (v ?? '').trim());
         if (trimmed.some(v => v.length > 0)) rows.push(trimmed);
@@ -42,10 +46,12 @@ function parseCSV(text){
     const trimmed = row.map(v => (v ?? '').trim());
     if (trimmed.some(v => v.length > 0)) rows.push(trimmed);
   }
+
   const header = rows[0] || [];
-  const data = rows.slice(1);
+  const data   = rows.slice(1);
   return { header, data };
 }
+
 
 // ===== ヘッダー厳密チェック（6列のみ必須） =====
 function ensureHeadersStrictRelaxed(header){
@@ -54,8 +60,7 @@ function ensureHeadersStrictRelaxed(header){
   const missing = required.filter(exp => !normalized.includes(exp));
   if (missing.length) {
     throw new Error('必須ヘッダーが不足しています:
-' + missing.map(m => `- ${m}`).join('
-'));
+' + missing.map(m => `- ${m}`).join('\n'));
   }
 }
 
