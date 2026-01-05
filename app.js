@@ -184,7 +184,7 @@ function openModal(item, noLabel){
   const nonEmpty = Object.entries(defects).filter(([k,v]) => (v ?? '').trim().length > 0);
   if (nonEmpty.length > 0) {
     const h3 = document.createElement('h3');
-    h3.textContent = '欠点情報';
+    h3.textContent = '生体情報';
     h3.style.marginTop = '16px';
     body.appendChild(h3);
 
@@ -316,4 +316,5 @@ function openLightbox(src){
 function closeLightbox(){ if (!lb) return; lb.el.classList.remove('show'); lb.el.setAttribute('aria-hidden','true'); lb.img.src=''; }
 
 document.addEventListener('DOMContentLoaded', initLightbox);
+
 
