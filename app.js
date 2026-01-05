@@ -68,7 +68,7 @@ function ensureHeadersStrictRelaxed(header) {
 // 欠点項目のヘッダー名（任意）
 const DEFECT_FIELDS = [
   '体重','毛質','耳','ペコ','目','鼻','嚙み合わせ','門歯歯列',
-  'デベソ','ヘルニア','狼爪','尾','パテラ左','パテラ右','胸','心雑','その他（ミスカラーなど)'
+  'デベソ','ヘルニア','狼爪','尾','パテラ左','パテラ右','胸','心雑','その他'
 ];
 
 function toNo(n){ return `No.${String(n).padStart(3,'0')}`; }
@@ -316,5 +316,6 @@ function openLightbox(src){
 function closeLightbox(){ if (!lb) return; lb.el.classList.remove('show'); lb.el.setAttribute('aria-hidden','true'); lb.img.src=''; }
 
 document.addEventListener('DOMContentLoaded', initLightbox);
+
 
 
