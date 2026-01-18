@@ -345,3 +345,17 @@ function closeLightbox(){
 }
 
 document.addEventListener('DOMContentLoaded', initLightbox);
+
+// ==== モーダルのクローズ操作を確実にバインド ====
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('modalClose');
+  if (btn) btn.addEventListener('click', closeModal);
+  // モーダルの背景クリックで閉じる（オプション）
+  const modal = document.getElementById('modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+});
+
