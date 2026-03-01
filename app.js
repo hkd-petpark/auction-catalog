@@ -60,7 +60,7 @@ function ensureHeadersStrictRelaxed(header) {
 
 // 欠点項目のヘッダー名（任意）
 const DEFECT_FIELDS = [
-  '体重','毛質','耳','ペコ','目','鼻','嚙み合わせ','門歯歯列',
+  '体重','毛質','耳','ペコ','目','鼻','噛み合わせ','門歯歯列',
   'デベソ','ヘルニア','狼爪','尾','パテラ左','パテラ右','胸','心雑','その他'
 ];
 
@@ -358,4 +358,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
 
